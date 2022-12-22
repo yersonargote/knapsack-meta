@@ -24,6 +24,7 @@ def main():
         optimal=optimal,
     )
 
+    # GWO
     gwo: GWO = GWO(
         max_iterations=max_iterations,
         N=N,
@@ -34,10 +35,10 @@ def main():
         beta=Solution(np.zeros(size), 0, 0),
         delta=Solution(np.zeros(size), 0, 0),
     )
-
     best = gwo.solve()
     solutions["GWO"] = best
 
+    # PSO
     phi_p, phi_g, v_max = 0.8, 0.9, 0.9
     #phi_p, phi_g, v_max = 1, 1, 1
     omega = 1
@@ -52,20 +53,21 @@ def main():
         v_max=v_max,
         global_best=SolutionPSO(np.zeros(size), 0, 0, np.zeros(size)),
     )
-    
     best = pso.solve()
     solutions["PSO"] = best
 
+    # GA
     ga = GA(
-          N=20,
-          generations=1000,
+          N=N,
+          generations=max_iterations,
           problem=problem,
-          population=np.empty(shape=20, dtype=object),
+          population=np.empty(shape=N, dtype=object),
           opponents=2,
       )
     best = ga.solve()
     solutions["GA"] = best
 
+    # GHS
     N, HMCR, PAR = 20, 0.9, 0.3
     ghs: GHS = GHS(
         problem=problem,
@@ -78,6 +80,7 @@ def main():
     
     best = ghs.solve()
     solutions["GHS"] = best
+
     for name, best in solutions.items():
         print(f"{name}")
         print(f'Fitness: {best.fitness} - {problem.evaluate(best.cells)}')
