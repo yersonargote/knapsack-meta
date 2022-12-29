@@ -9,6 +9,8 @@ from knapsack import Problem, Solution
 
 @dataclass
 class GA:
+    """Genetic Algorithm"""
+
     N: int
     generations: int
     problem: Problem
@@ -16,6 +18,7 @@ class GA:
     opponents: int
 
     def init_individual(self) -> Solution:
+        """Create an individual solution"""
         cells = np.random.randint(0, 2, self.problem.size)
         weight = self.problem.weigh(cells)
         while weight > self.problem.capacity:

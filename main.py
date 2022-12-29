@@ -82,10 +82,12 @@ def main():
     solutions["GHS"] = best
 
     for name, best in solutions.items():
-        print(f"{name} - Aprox: {problem.optimal - best.fitness}")
-        print(f"Fitness: {best.fitness} - validation {problem.evaluate(best.cells)}")
-        print(f"Weigh: {best.weight} - validation {problem.weigh(best.cells)}")
+        print(f"{name}")
         print(f"Capacity: {problem.capacity} - Optimal: {problem.optimal}")
+        valid = np.isclose(problem.evaluate(best.cells), best.fitness)
+        print(f"Fitness: {best.fitness} - Valid: {valid}")
+        valid = np.isclose(best.weight, problem.weigh(best.cells))
+        print(f"Weigh: {best.weight} - Valid {valid}")
         print(f"{best.cells}")
 
 
