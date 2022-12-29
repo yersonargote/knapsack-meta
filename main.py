@@ -1,10 +1,10 @@
 import numpy as np
-from gwo import GWO
-from ghs import GHS
-from pso import PSO
-from ga import GA
 
+from ga import GA
+from ghs import GHS
+from gwo import GWO
 from knapsack import Problem, Solution
+from pso import PSO
 from pso import Solution as SolutionPSO
 from utils import read_file
 
@@ -40,7 +40,7 @@ def main():
 
     # PSO
     phi_p, phi_g, v_max = 0.8, 0.9, 0.9
-    #phi_p, phi_g, v_max = 1, 1, 1
+    # phi_p, phi_g, v_max = 1, 1, 1
     omega = 1
     pso: PSO = PSO(
         problem=problem,
@@ -58,12 +58,12 @@ def main():
 
     # GA
     ga = GA(
-          N=N,
-          generations=max_iterations,
-          problem=problem,
-          population=np.empty(shape=N, dtype=object),
-          opponents=2,
-      )
+        N=N,
+        generations=max_iterations,
+        problem=problem,
+        population=np.empty(shape=N, dtype=object),
+        opponents=2,
+    )
     best = ga.solve()
     solutions["GA"] = best
 
@@ -77,16 +77,17 @@ def main():
         HMCR=HMCR,
         PAR=PAR,
     )
-    
+
     best = ghs.solve()
     solutions["GHS"] = best
 
     for name, best in solutions.items():
-        print(f"{name}")
-        print(f'Fitness: {best.fitness} - {problem.evaluate(best.cells)}')
-        print(f'Weigh: {best.weight} - {problem.weigh(best.cells)}')
-        print(f'Capacity: {problem.capacity} - Optimal: {problem.optimal}')
-        print(f'{best.cells}')
+        print(f"{name} - Aprox: {problem.optimal - best.fitness}")
+        print(f"Fitness: {best.fitness} - validation {problem.evaluate(best.cells)}")
+        print(f"Weigh: {best.weight} - validation {problem.weigh(best.cells)}")
+        print(f"Capacity: {problem.capacity} - Optimal: {problem.optimal}")
+        print(f"{best.cells}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,9 @@
 # Grey Wolf Optimizer
-import numpy as np
-from knapsack import Problem, Solution
 from dataclasses import dataclass
+
+import numpy as np
+
+from knapsack import Problem, Solution
 
 
 @dataclass
@@ -49,10 +51,7 @@ class GWO:  # Grey Wolf Optimizer
 
     def update_alpha_beta_delta(self):
         self.population = np.array(
-            sorted(
-                self.population,
-                reverse=True,
-                key=lambda x: x.fitness),
+            sorted(self.population, reverse=True, key=lambda x: x.fitness),
             dtype=object,
         )
         self.alpha = self.population[0]
@@ -60,7 +59,7 @@ class GWO:  # Grey Wolf Optimizer
         self.delta = self.population[2]
 
     def update_population(self):
-        for i in range(self.N):
+        for i in range(3, self.N):
             A1 = 2 * self.a * np.random.uniform(0, 1, self.problem.size) - self.a
             C1 = 2 * np.random.uniform(0, 1, self.problem.size)
             D_alpha = np.abs(C1 * self.alpha.cells - self.population[i].cells)

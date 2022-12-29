@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import List, Tuple
 
 
 def read_file(filename: str) -> Tuple[int, int, List, List, float]:

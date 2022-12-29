@@ -1,8 +1,10 @@
 # Particle Swarm Optimzation
+from dataclasses import dataclass
+
 import numpy as np
+
 from knapsack import Problem
 from knapsack import Solution as BaseSolution
-from dataclasses import dataclass
 
 
 @dataclass
@@ -11,7 +13,7 @@ class Solution(BaseSolution):
 
 
 @dataclass
-class PSO: # Particle Swarm Optimzation
+class PSO:  # Particle Swarm Optimzation
     problem: Problem
     max_iterations: int
     population: np.ndarray
@@ -31,7 +33,10 @@ class PSO: # Particle Swarm Optimzation
                     weight -= self.problem.weights[i]
         else:
             for i in np.random.permutation(np.arange(self.problem.size)):
-                if cells[i] == 0 and self.problem.weights[i] + weight <= self.problem.capacity:
+                if (
+                    cells[i] == 0
+                    and self.problem.weights[i] + weight <= self.problem.capacity
+                ):
                     cells[i] = 1
                     weight += self.problem.weights[i]
         fitness = self.problem.evaluate(cells)
@@ -40,8 +45,8 @@ class PSO: # Particle Swarm Optimzation
 
     def init_population(self) -> None:
         for i in range(self.N):
-          cells = np.random.randint(0, 2, self.problem.size)
-          self.population[i] = self.repair(cells)
+            cells = np.random.randint(0, 2, self.problem.size)
+            self.population[i] = self.repair(cells)
 
     def get_global_best(self):
         return np.array(sorted(self.population, reverse=True))[0]
