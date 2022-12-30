@@ -1,4 +1,6 @@
 import numpy as np
+import typer
+from rich import print
 
 from ga import GA
 from ghs import GHS
@@ -9,10 +11,9 @@ from pso import Solution as SolutionPSO
 from utils import read_file
 
 
-def main():
+def main(name: str = typer.Argument("Knapsack6")):
     np.random.seed(42)
     solutions = {}
-    name = "Knapsack6"
     N, max_iterations = 20, 1000
     size, capacity, weights, profits, optimal = read_file(f"knapsack/data/{name}.txt")
     problem: Problem = Problem(
@@ -92,4 +93,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(main)
