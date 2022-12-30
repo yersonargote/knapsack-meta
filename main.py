@@ -87,7 +87,7 @@ def main():
         valid = np.isclose(problem.evaluate(best.cells), best.fitness)
         print(f"Fitness: {best.fitness} - Valid: {valid}")
         valid = np.isclose(best.weight, problem.weigh(best.cells))
-        print(f"Weigh: {best.weight} - Valid {valid}")
+        print(f"Weigh: {best.weight} - Valid: {valid}")
         print(f"{best.cells}")
 
 
