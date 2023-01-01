@@ -1,4 +1,5 @@
 # Particle Swarm Optimzation
+from copy import deepcopy
 from dataclasses import dataclass
 
 import numpy as np
@@ -18,11 +19,12 @@ class PSO:  # Particle Swarm Optimzation
     max_iterations: int
     population: np.ndarray
     N: int
-    omega: float
-    phi_p: float  # cognitive/local weight
-    phi_g: float  # social/global weight
+    best: Solution
+    alpha: float  # Proportion of velocity to be retained
+    beta: float  # Proportion of personal best to be retained
+    delta: float  # Proportion of global best to be retained
+    epsilon: float  # jump size of particle
     v_max: float
-    global_best: Solution
 
     def repair(self, cells: np.ndarray) -> Solution:
         weight = self.problem.weigh(cells)
@@ -40,7 +42,7 @@ class PSO:  # Particle Swarm Optimzation
                     cells[i] = 1
                     weight += self.problem.weights[i]
         fitness = self.problem.evaluate(cells)
-        velocity = np.random.uniform(0, self.v_max, self.problem.size)
+        velocity = np.random.uniform(-self.v_max, self.v_max, self.problem.size)
         return Solution(cells=cells, fitness=fitness, weight=weight, velocity=velocity)
 
     def init_population(self) -> None:
@@ -48,15 +50,10 @@ class PSO:  # Particle Swarm Optimzation
             cells = np.random.randint(0, 2, self.problem.size)
             self.population[i] = self.repair(cells)
 
-    def get_global_best(self):
-        return np.array(sorted(self.population, reverse=True))[0]
-
-    def update_velocity(self, solution: Solution) -> Solution:
-        r_p, r_g = np.random.uniform(0, 1, size=2)
-        vel_cognitive = self.phi_p * r_p * (solution.cells - solution.velocity)
-        vel_social = self.phi_g * r_g * (self.global_best.cells - solution.cells)
-        solution.velocity = self.omega * solution.velocity + vel_cognitive + vel_social
-        return solution
+    def set_global_best(self):
+        self.population = np.array(sorted(self.population, reverse=True), dtype=object)
+        if self.population[0] > self.best:
+            self.best = deepcopy(self.population[0])
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -68,20 +65,27 @@ class PSO:  # Particle Swarm Optimzation
         X[X >= rnd] = 1
         return X
 
-    def update_position(self, solution: Solution) -> Solution:
-        cells = solution.cells + solution.velocity
-        cells = self.binarization(cells)
-        solution = self.repair(cells)
-        return solution
-
     def solve(self):
         self.init_population()
-        self.global_best = self.get_global_best()
+        self.set_global_best()
         for _ in range(self.max_iterations):
+            best_local = self.population[0]
             for i in range(self.N):
-                solution = self.population[i]
-                solution = self.update_velocity(solution)
-                solution = self.update_position(solution)
-                self.population[i] = solution
-            self.global_best = self.get_global_best()
-        return self.global_best
+                # Update Velocity
+                self.population[i].velocity = (
+                    self.alpha * self.population[i].velocity
+                    + np.random.uniform(0, self.beta)
+                    * (self.best.cells - self.population[i].cells)
+                    + np.random.uniform(0, self.delta)
+                    * (best_local.cells - self.population[i].cells)
+                )
+
+                # Update cells
+                cells = (
+                    self.population[i].cells
+                    + self.epsilon * self.population[i].velocity
+                )
+                self.population[i].cells = self.binarization(cells)
+                self.population[i] = self.repair(self.population[i].cells)
+            self.set_global_best()
+        return self.best

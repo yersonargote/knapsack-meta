@@ -14,7 +14,7 @@ from utils import read_file
 def main(name: str = typer.Argument("Knapsack6")):
     np.random.seed(42)
     solutions = {}
-    N, max_iterations = 20, 1000
+    N, max_iterations, v_max = 20, 1000, 1
     size, capacity, weights, profits, optimal = read_file(f"knapsack/data/{name}.txt")
     problem: Problem = Problem(
         name=name,
@@ -40,19 +40,18 @@ def main(name: str = typer.Argument("Knapsack6")):
     solutions["GWO"] = best
 
     # PSO
-    phi_p, phi_g, v_max = 0.8, 0.9, 0.9
-    # phi_p, phi_g, v_max = 1, 1, 1
-    omega = 1
+    alpha, beta, delta, epsilon = 0.9, 1.0, 1.0, 0.5
     pso: PSO = PSO(
         problem=problem,
         max_iterations=max_iterations,
         N=N,
         population=np.empty(shape=N, dtype=object),
-        omega=omega,
-        phi_p=phi_p,
-        phi_g=phi_g,
+        best=SolutionPSO(np.zeros(size), 0, 0, np.zeros(size)),
+        alpha=alpha,
+        beta=beta,
+        delta=delta,
+        epsilon=epsilon,
         v_max=v_max,
-        global_best=SolutionPSO(np.zeros(size), 0, 0, np.zeros(size)),
     )
     best = pso.solve()
     solutions["PSO"] = best
@@ -84,7 +83,7 @@ def main(name: str = typer.Argument("Knapsack6")):
 
     for name, best in solutions.items():
         print(f"{name}")
-        print(f"Capacity: {problem.capacity} - Optimal: {problem.optimal}")
+        print(f"Optimal: {problem.optimal} - Capacity: {problem.capacity}")
         valid = np.isclose(problem.evaluate(best.cells), best.fitness)
         print(f"Fitness: {best.fitness} - Valid: {valid}")
         valid = np.isclose(best.weight, problem.weigh(best.cells))
